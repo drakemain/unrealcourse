@@ -47,13 +47,28 @@ void UGrabber::getPhysicsHandle()
 void UGrabber::Grab() 
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s used grab."), *GetOwner()->GetName())
-	this->GetFirstPhysicsBodyInReach();
+	const FHitResult hitResult = this->GetFirstPhysicsBodyInReach(); //linetrace hit result
+	UPrimitiveComponent* componentToGrab = hitResult.GetComponent();
+	AActor* ActorHit = hitResult.GetActor();
+	
+	if (ActorHit) {
+	// if linetrace hit valid actor
+		this->PhysicsHandle->GrabComponent(
+			componentToGrab,
+			NAME_None,
+			componentToGrab->GetOwner()->GetActorLocation(),
+			true
+		);
+	}
 
 }
 
 void UGrabber::Release()
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s released grab."), *GetOwner()->GetName())
+	if (PhysicsHandle->GrabbedComponent) {
+		this->PhysicsHandle->ReleaseComponent();
+		UE_LOG(LogTemp, Warning, TEXT("%s released grab."), *GetOwner()->GetName())
+	}
 }
 
 const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
@@ -81,7 +96,8 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 	if (HitActor) {
 		UE_LOG(LogTemp, Warning, TEXT("Grabber hit: %s"), *HitActor->GetName())
 	}
-	return FHitResult();
+
+	return Hit;
 }
 
 
@@ -89,5 +105,20 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (PhysicsHandle->GrabbedComponent) {
+		FVector PlayerViewPointLocation;
+		FRotator PlayerViewPointRotation;
+
+		GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+			PlayerViewPointLocation, //out
+			PlayerViewPointRotation  //out
+		);
+
+		FVector playerReach = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * this->reach;
+
+
+		PhysicsHandle->SetTargetLocation(playerReach);
+	}
 }
 
