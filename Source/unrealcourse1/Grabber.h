@@ -27,9 +27,15 @@ private:
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 	UInputComponent* InputComponent = nullptr;
 
+	void getInputComponents();
+	void getPhysicsHandle();
+
 	void Grab();
 	void Release();
-	void getPhysicsHandle();
-	void getInputComponents();
+	
 	const FHitResult GetFirstPhysicsBodyInReach();
+	void Pick(FHitResult &Hit); // takes out parameter
+	FVector GetReachEnd(FVector, FRotator); // takes out parameters
+	FVector GetReachStart();
+	void moveGrabbedObject();
 };
