@@ -8,6 +8,9 @@ Saved/
 Content/StarterContent/*
 
 #Visual Studio Generated Files
+*.VC.db
 *.VC.opendb
 *.sdf
+*.sln
 */*.suo
+
