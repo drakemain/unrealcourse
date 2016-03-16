@@ -22,8 +22,6 @@ void UOpenDoor::BeginPlay()
 
 	this->close = GetOwner()->GetActorRotation();
 	this->open = close + FRotator(0.f, 90.f, 0.f);
-
-	this->DoorOpener = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 void UOpenDoor::openDoor() 
@@ -37,12 +35,27 @@ void UOpenDoor::closeDoor()
 	GetOwner()->SetActorRotation(this->close);
 }
 
+float UOpenDoor::GetTotalPressurePlateMass()
+{
+	float totalMass = 0.f;
+	TArray<AActor*> OverlappingActors;
+
+	this->PressurePlate->GetOverlappingActors(OverlappingActors); // out parameter
+
+	for (const AActor* Actor : OverlappingActors) {
+		UE_LOG(LogTemp, Warning, TEXT("Found an actor: %s"), *Actor->GetName());
+		totalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+
+	return totalMass;
+}
+
 // Called every frame
 void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	if (PressurePlate->IsOverlappingActor(DoorOpener)) {
+	if (this->GetTotalPressurePlateMass() > this->triggerWeight) {
 		openDoor();
 		this->doorOpenedTime = GetWorld()->GetTimeSeconds();
 	}

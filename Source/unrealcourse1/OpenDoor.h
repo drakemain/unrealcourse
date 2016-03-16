@@ -31,11 +31,13 @@ private:
 	float doorOpenedTime;
 
 	UPROPERTY(EditAnywhere)
+	float triggerWeight = 50.f;
+
+	UPROPERTY(EditAnywhere)
 	float closeDelay = 1.f;
 
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate;
 
-	AActor* DoorOpener;
-	
+	float GetTotalPressurePlateMass();
 };
