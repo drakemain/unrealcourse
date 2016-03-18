@@ -26,8 +26,8 @@ void UOpenDoor::BeginPlay()
 
 void UOpenDoor::openDoor() 
 {
-	GetOwner()->SetActorRotation(this->open);
-
+	//GetOwner()->SetActorRotation(this->open);
+	this->OnOpenRequest.Broadcast();
 }
 
 void UOpenDoor::closeDoor()
@@ -55,7 +55,10 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	if (this->GetTotalPressurePlateMass() > this->triggerWeight) {
+	if (!this->PressurePlate) {
+		UE_LOG(LogTemp, Error, TEXT("%s is missing pressure plate!"), *GetOwner()->GetName())
+	}
+	else if (this->GetTotalPressurePlateMass() > this->triggerWeight) {
 		openDoor();
 		this->doorOpenedTime = GetWorld()->GetTimeSeconds();
 	}
