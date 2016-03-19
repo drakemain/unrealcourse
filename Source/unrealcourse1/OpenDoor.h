@@ -5,7 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "OpenDoor.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpenRequest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDoorEvent);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UNREALCOURSE1_API UOpenDoor : public UActorComponent
@@ -18,27 +18,19 @@ public:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	void openDoor();
-	void closeDoor();
 	
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnOpenRequest OnOpenRequest;
+	FDoorEvent OnOpen;
+
+	UPROPERTY(BlueprintAssignable)
+	FDoorEvent OnClose;
 
 private:
-	FRotator open;
-	FRotator close;
-
-	float doorOpenedTime;
-
 	UPROPERTY(EditAnywhere)
-	float triggerWeight = 50.f;
-
-	UPROPERTY(EditAnywhere)
-	float closeDelay = 1.f;
+	float triggerMass = 50.f;
 
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate = nullptr;
